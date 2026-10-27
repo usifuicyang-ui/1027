@@ -1,1 +1,153 @@
-hello
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NPDL 2026 校際成果分析儀表板</title>
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--tx:#1b2033;--mu:#5d6580;--bd:#e3e6f0;--c1:#2f6fed;--c2:#12a594;--c3:#f5a524;--c4:#e5484d;--soft:#eef2ff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1120;--card:#171b2e;--tx:#e8ebf7;--mu:#98a1be;--bd:#2a3050;--c1:#6e9bff;--c2:#35c9b5;--c3:#ffc247;--c4:#ff7a7f;--soft:#202646;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1120;--card:#171b2e;--tx:#e8ebf7;--mu:#98a1be;--bd:#2a3050;--c1:#6e9bff;--c2:#35c9b5;--c3:#ffc247;--c4:#ff7a7f;--soft:#202646;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+.w{max-width:1120px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.6rem;margin:.2em 0}h2{font-size:1.05rem;margin:0 0 10px}
+.sub{color:var(--mu);margin:0 0 16px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+select,input{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font:inherit}
+input{flex:1;min-width:150px}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px}
+.k b{display:block;font-size:1.7rem;color:var(--c1);line-height:1.2}.k span{color:var(--mu);font-size:.85rem}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:16px}
+.ch{position:relative;height:270px}
+.sc{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:720px}
+th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+th{cursor:pointer;color:var(--mu);white-space:nowrap}
+td small{color:var(--mu)}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;background:var(--soft);font-size:.78rem}
+ul{margin:0;padding-left:1.2em}li{margin:.35em 0}
+.r{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.r .c b{color:var(--c1)}
+.note{color:var(--mu);font-size:.82rem}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>2026 深度學習教學創新躍進 校際成果分析</h1>
+<p class="sub">資料來源：《NPDL 2026 校際成果發表會電子手冊》（7 組、20 門課程）。可用下方篩選器即時更新所有指標與圖表。</p>
+
+<div class="bar">
+<select id="fg"><option value="">全部組別</option></select>
+<select id="ft"><option value="">全部課程類型</option></select>
+<input id="fq" placeholder="搜尋學校或課程名稱…">
+</div>
+
+<div class="k" id="kpi"></div>
+
+<div class="g">
+<div class="c"><h2>課程類型分布</h2><div class="ch"><canvas id="c1"></canvas></div></div>
+<div class="c"><h2>各組參與學生數</h2><div class="ch"><canvas id="c2"></canvas></div></div>
+<div class="c"><h2>教學時數 × 學生規模（泡泡大小＝教師人數）</h2><div class="ch"><canvas id="c3"></canvas></div></div>
+<div class="c"><h2>課程時數分級</h2><div class="ch"><canvas id="c4"></canvas></div></div>
+<div class="c"><h2>教師團隊規模</h2><div class="ch"><canvas id="c5"></canvas></div></div>
+<div class="c"><h2>個案切片：永平高中前測（協作力自評，n=27）</h2><div class="ch"><canvas id="c6"></canvas></div><p class="note">手冊中可清楚讀取的前測分布；以 NPDL 五級量尺自評。</p></div>
+</div>
+
+<div class="c sc" style="margin-bottom:16px">
+<h2>課程明細（點表頭排序）</h2>
+<table><thead><tr id="th"></tr></thead><tbody id="tb"></tbody></table>
+</div>
+
+<div class="c" style="margin-bottom:16px"><h2>關鍵發現</h2>
+<ul>
+<li><b>規模高度集中：</b>學生數中位數僅 29.5 人，但大同高中（546）、慈濟附中（191）、林口高中（120）三門課就占全部學生約 60%，成果解讀需區分「小班深耕」與「大規模推廣」。</li>
+<li><b>必修課是主力：</b>20 門中有 11 門為部定／校訂必修（55%），顯示深度學習已進入正式課程，而非僅限選修或專案。</li>
+<li><b>時數差異極大：</b>可辨識時數的 19 門中，5 門不超過 10 節（最少 2 節），7 門達 36 節以上（最多 40 節）；短時數單元與整學期課程的成效不宜直接比較。</li>
+<li><b>協同備課常見：</b>11 門（55%）由 2 人以上授課，數位實驗高中有 10 位教師，且連續實施三屆（2022–2025），是迭代優化的範例。</li>
+<li><b>跨域與跨境連結：</b>至少 5 門與 SDGs 直接連動；永平高中與雅加達臺灣學校、臺東高中與澳洲籃球俱樂部、基隆—花蓮遠距授課，展現跨校與跨國合作模式。</li>
+<li><b>評估方式不一致：</b>各校使用 Google 表單圓餅圖、李克特長條圖或學生文字回饋，量尺與樣本數不同（例如林口前測僅 10 份回應），難以做跨校量化比較。</li>
+</ul></div>
+
+<div class="c"><h2>改善建議</h2>
+<div class="r">
+<div class="c"><b>1. 統一前後測工具</b><br>全校際採同一份 6C 五級量尺（證據有限→精熟），固定題目與施測時點，才能計算跨校進步幅度。</div>
+<div class="c"><b>2. 提高樣本涵蓋率</b><br>前測／後測盡量涵蓋全班，並公布回收率；大班課程（≥100 人）至少抽樣 30% 並說明方法。</div>
+<div class="c"><b>3. 成果簡報加入必填數據欄</b><br>建議固定「前測—後測—差異」圖表，並標示 n 值與樣本代表性，避免只呈現單點結果。</div>
+<div class="c"><b>4. 時數與目標對齊</b><br>≤10 節的短單元可聚焦 1–2 項素養；完整 36–40 節課程再追蹤 4 項以上，避免目標過寬。</div>
+<div class="c"><b>5. 建立大班推廣機制</b><br>大同、慈濟等大規模課程應透過共備社群、評分一致性校準與學習歷程平台，維持品質。</div>
+<div class="c"><b>6. 擴散跨校／跨境範式</b><br>整理永平×雅加達、基隆×花蓮、數位實驗三屆迭代的作法為操作手冊，供其他學校複製。</div>
+</div></div>
+
+<p class="note" style="margin-top:16px">資料說明：本手冊為 258 頁圖像式 PDF，無法自動擷取全部圖表數值。課程基本資料（類型、學分、節數、學生數、年級、教師數）已逐校讀取；永平高中（生態環境課程）手冊未列學分與節數，學生數以前測 27 份回應估計。各校後測與質性成果未納入量化指標。</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// [組, 學校, 課程, 類型, 學分, 節數, 學生數, 年級, 教師數, 實施時間]
+const D=[
+["A","林口高中","Game On","多元選修",2,2,120,"高二、高三",1,"112學年度"],
+["A","新竹高商","從鹿港乘桴記發現新竹之美","部定必修",4,6,40,"綜高二年級",1,"112下學期"],
+["A","竹圍高中","國文課的自我探索：甲骨文植栽","部定必修",2,3,54,"高二體育班",1,"113/10/21–10/29"],
+["B","嘉科實中","南院游於藝","校訂必修",2,36,92,"高一",3,"113/9–114/1"],
+["B","義大國際高中","HOW DO I LIVE？","部定必修",2,4,22,"10年級",1,"113上學期"],
+["B","麗山高中","歷史領域探索：鄭成功人物形象","校訂必修",2,18,22,"高一",1,"113/10/21–12/2"],
+["C","臺東高中","SDGs 的全球公民對話","校訂必修",2,36,36,"高一",2,"2024/8–2025/1"],
+["C","花蓮高中","搶救海洋大作戰","部定必修",2,40,29,"高三",1,"112下學期"],
+["C","永平高中","SDGs 創意行銷","多元選修",1,18,20,"高一",1,"112下學期"],
+["D","慈濟附中","國際關懷與行動","校訂必修",1,18,191,"高二",6,"114上學期"],
+["D","基隆高中","在地走讀趣","校訂必修",2,36,22,"高一",2,"113/9–114/1"],
+["D","三民高中","多元文本與實作 Issues on Refugees","多元選修",2,32,31,"高二",1,"113/2–6"],
+["E","數位實驗高中","設計思考","校訂必修",2,36,47,"高一",10,"2022–2025（三屆）"],
+["E","永平高中","生態環境探究與實作（綠色生活地圖）","其他",null,null,27,"—",4,"—"],
+["F","臺東高中","與澳洲籃球俱樂部中學生交流","其他",1,18,28,"高二",3,"2024/8/30–9/17"],
+["F","新竹高商","一電鎖鄉愁","多元選修",2,36,26,"高二",3,"112/9–113/6"],
+["F","北大高中","Youth in Action：SDGs 實踐方案","其他",2,40,26,"高二",2,"113/9–114/1"],
+["G","基隆高中＋花蓮高中","多元宇宙萬物聯網（遠距授課）","多元選修",2,28,30,"高三",5,"2024上半年"],
+["G","臺南一中","臺南400：信仰與族群","其他",0,10,25,"高一",3,"112上學期"],
+["G","大同高中","自然科探究與實作","部定必修",4,20,546,"11年級",1,"全學年"]
+];
+const T=["部定必修","校訂必修","多元選修","其他"];
+const cols=[["組","0"],["學校","1"],["課程","2"],["類型","3"],["學分","4"],["節數","5"],["學生","6"],["年級","7"],["師資","8"]];
+const $=id=>document.getElementById(id);
+const gs=[...new Set(D.map(r=>r[0]))];
+gs.forEach(g=>$("fg").add(new Option("第 "+g+" 組",g)));
+T.forEach(t=>$("ft").add(new Option(t,t)));
+$("th").innerHTML=cols.map((c,i)=>`<th data-i="${c[1]}">${c[0]}</th>`).join("");
+let sk=0,sd=1,charts=[];
+const med=a=>{a=a.filter(x=>x!=null).sort((x,y)=>x-y);if(!a.length)return "—";const m=a.length>>1;return a.length%2?a[m]:(a[m-1]+a[m])/2};
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function rows(){const g=$("fg").value,t=$("ft").value,q=$("fq").value.trim();
+return D.filter(r=>(!g||r[0]===g)&&(!t||r[3]===t)&&(!q||(r[1]+r[2]).includes(q)))}
+function render(){
+const R=rows().slice().sort((a,b)=>{const x=a[sk],y=b[sk];if(x==null)return 1;if(y==null)return -1;return (x>y?1:x<y?-1:0)*sd});
+const tot=R.reduce((s,r)=>s+r[6],0),team=R.filter(r=>r[8]>1).length;
+$("kpi").innerHTML=[[R.length,"課程數"],[tot.toLocaleString(),"學生數"],[med(R.map(r=>r[6])),"學生數中位數"],[med(R.map(r=>r[5])),"節數中位數"],[R.length?Math.round(team/R.length*100)+"%":"—","協同授課比例"]].map(k=>`<div class="c k1"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
+$("tb").innerHTML=R.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}<br><small>${r[9]}</small></td><td><span class="tag">${r[3]}</span></td><td>${r[4]??"—"}</td><td>${r[5]??"—"}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td></tr>`).join("")||'<tr><td colspan="9">無符合條件的課程</td></tr>';
+charts.forEach(c=>c.destroy());charts=[];
+const tx=css("--tx"),mu=css("--mu"),bd=css("--bd"),pal=[css("--c1"),css("--c2"),css("--c3"),css("--c4")];
+Chart.defaults.color=mu;Chart.defaults.borderColor=bd;Chart.defaults.font.family='"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+const mk=(id,cfg)=>{cfg.options=Object.assign({responsive:true,maintainAspectRatio:false},cfg.options||{});charts.push(new Chart($(id),cfg))};
+const legend={plugins:{legend:{position:"bottom",labels:{color:tx}}}};
+mk("c1",{type:"doughnut",data:{labels:T,datasets:[{data:T.map(t=>R.filter(r=>r[3]===t).length),backgroundColor:pal,borderWidth:0}]},options:legend});
+mk("c2",{type:"bar",data:{labels:gs.map(g=>g+" 組"),datasets:[{label:"學生數",data:gs.map(g=>R.filter(r=>r[0]===g).reduce((s,r)=>s+r[6],0)),backgroundColor:pal[0],borderRadius:4}]},options:{plugins:{legend:{display:false}}}});
+mk("c3",{type:"bubble",data:{datasets:T.map((t,i)=>({label:t,backgroundColor:pal[i]+"bb",borderColor:pal[i],data:R.filter(r=>r[3]===t&&r[5]!=null).map(r=>({x:r[5],y:r[6],r:4+r[8]*1.6,n:r[1]+"｜"+r[2],t:r[8]}))}))},
+options:{scales:{x:{title:{display:true,text:"總節數"},min:0},y:{type:"logarithmic",title:{display:true,text:"學生數（對數）"}}},plugins:{legend:{position:"bottom",labels:{color:tx}},tooltip:{callbacks:{label:c=>`${c.raw.n}：${c.raw.x} 節、${c.raw.y} 人、${c.raw.t} 位教師`}}}}});
+const bk=(a,f)=>f.map(x=>a.filter(x[1]).length);
+const sess=R.map(r=>r[5]).filter(x=>x!=null);
+mk("c4",{type:"bar",data:{labels:["≤10 節","11–20 節","21–35 節","≥36 節"],datasets:[{label:"課程數",data:[sess.filter(x=>x<=10).length,sess.filter(x=>x>10&&x<=20).length,sess.filter(x=>x>20&&x<36).length,sess.filter(x=>x>=36).length],backgroundColor:pal[1],borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{precision:0},beginAtZero:true}}}});
+const tm=R.map(r=>r[8]);
+mk("c5",{type:"bar",data:{labels:["1 人","2 人","3 人","4–6 人","7 人以上"],datasets:[{label:"課程數",data:[tm.filter(x=>x==1).length,tm.filter(x=>x==2).length,tm.filter(x=>x==3).length,tm.filter(x=>x>=4&&x<=6).length,tm.filter(x=>x>=7).length],backgroundColor:pal[2],borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{precision:0},beginAtZero:true}}}});
+}
+// static case slice: 永平 collaboration pre-test (percentages as printed in handbook)
+function pre(){const pal=[css("--c1"),css("--c4"),css("--c3"),css("--c2")];
+new Chart($("c6"),{type:"doughnut",data:{labels:["證據有限","萌芽","發展","精熟"],datasets:[{data:[22.2,70.4,7.4,0],backgroundColor:pal,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:css("--tx")}},tooltip:{callbacks:{label:c=>`${c.label}：${c.raw}%`}}}}})}
+["fg","ft"].forEach(i=>$(i).onchange=render);$("fq").oninput=render;
+$("th").onclick=e=>{const v=e.target.dataset.i;if(v==null)return;const i=+v;sd=sk===i?-sd:1;sk=i;render()};
+matchMedia("(prefers-color-scheme: dark)").onchange=()=>location.reload();
+render();pre();
+</script>
+</body>
+</html>
